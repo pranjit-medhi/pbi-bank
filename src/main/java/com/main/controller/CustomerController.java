@@ -4,8 +4,12 @@ import com.main.dto.CustomerDTO;
 import com.main.entity.Customer;
 import com.main.exception.GlobalException;
 import com.main.service.CustomerService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -13,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/")
+@Validated
 public class CustomerController {
     private CustomerService customerService;
 
@@ -27,7 +32,8 @@ public class CustomerController {
         return new ResponseEntity<>(allCustomer, HttpStatus.OK);
     }
     @GetMapping("/customers/:{customerId}")
-    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long customerId) throws GlobalException {
+    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable @Min(value = 1, message = "Customer id should be between 1 and 100")
+                                                           @Max(value = 100, message = "Customer id should be between 1 and 100") Long customerId) throws GlobalException {
 
         try {
             CustomerDTO customerDto = customerService.getCustomer(customerId);
@@ -40,7 +46,7 @@ public class CustomerController {
     }
 
     @PostMapping("/customers")
-    public ResponseEntity<CustomerDTO> addCustomer(@RequestBody CustomerDTO customer)
+    public ResponseEntity<CustomerDTO> addCustomer(@Valid  @RequestBody CustomerDTO customer)
     {
         try {
             CustomerDTO customerDTO = customerService.addCustomer(customer);
